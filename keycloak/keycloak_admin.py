@@ -42,7 +42,10 @@ from .urls_patterns import URL_ADMIN_SERVER_INFO, URL_ADMIN_CLIENT_AUTHZ_RESOURC
     URL_ADMIN_GROUP_MEMBERS, URL_ADMIN_USER_STORAGE, URL_ADMIN_GROUP_PERMISSIONS, URL_ADMIN_IDPS, \
     URL_ADMIN_USER_CLIENT_ROLES_AVAILABLE, URL_ADMIN_USERS, URL_ADMIN_CLIENT_SCOPES, \
     URL_ADMIN_CLIENT_SCOPES_ADD_MAPPER, URL_ADMIN_CLIENT_SCOPE, URL_ADMIN_CLIENT_SECRETS, \
-    URL_ADMIN_USER_REALM_ROLES
+    URL_ADMIN_USER_REALM_ROLES, URL_ADMIN_CLIENT_SCOPE_MAPPINGS, URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT, \
+    URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_AVAILABLE, URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_COMPOSITE, \
+    URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM, URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_AVAILABLE, \
+    URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_COMPOSITE 
 
 
 class KeycloakAdmin:
@@ -905,6 +908,74 @@ class KeycloakAdmin:
         params_path = {"realm-name": self.realm_name, "id": user_id, "client-id": client_id}
         data_raw = self.raw_post(URL_ADMIN_USER_CLIENT_ROLES.format(**params_path),
                                  data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_client_scope_mapping(self, client_id):
+        """
+        Get all scope mappings for the client.
+
+        :param client_id: id of client scope (not name)
+
+        MappingsRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_mappingsrepresentation
+        
+        :return: MappingsRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_client_roles_to_client_scope_mapping(self, client_id, client, payload):
+        """
+        Add client-level roles to the client’s scope.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :param client_id: id of client (not client-id)
+        :param client
+        :param payload: array RoleRepresentation
+
+        :return Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path),
+                                    data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_roles_for_client_scope_mapping(self, client_id, client, payload):
+        """
+        Get the roles associated with a client’s scope. Returns roles for the client.
+
+        :param client_id: id of client (not client-id)
+        :param client
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :return array RoleRepresentation
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def remove_client_roles_from_client_scope_mapping(self, client_id, client, payload):
+        """
+        Remove client-level roles from the client’s scope.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :param client_id: id of client (not client-id)
+        :param client
+        :param payload: array RoleRepresentation
+
+        :return Keycloak server response
+        """
+        params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
+        data_raw = self.raw_delete(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path),
+                                    data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
     def create_realm_role(self, payload, skip_exists=False):
