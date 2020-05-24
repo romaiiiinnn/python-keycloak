@@ -934,28 +934,30 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
-        :param client
+        :param client: id of client-level roles to add
         :param payload: array RoleRepresentation
 
         :return Keycloak server response
         """
+
         params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
         data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path),
                                     data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
 
-    def get_roles_for_client_scope_mapping(self, client_id, client, payload):
+    def get_client_roles_for_client_scope_mapping(self, client_id, client, payload):
         """
         Get the roles associated with a client’s scope. Returns roles for the client.
 
         :param client_id: id of client (not client-id)
-        :param client
+        :param client: id of client-level roles
 
         RoleRepresentation
         https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
 
         :return array RoleRepresentation
         """
+
         params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
         data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path))
         return raise_error_from_response(data_raw, KeycloakGetError)
@@ -968,15 +970,134 @@ class KeycloakAdmin:
         https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
 
         :param client_id: id of client (not client-id)
-        :param client
+        :param client: id of client-level roles to remove
         :param payload: array RoleRepresentation
 
         :return Keycloak server response
         """
+
         params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
         data_raw = self.raw_delete(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT.format(**params_path),
                                     data=json.dumps(payload))
         return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_available_client_roles_for_client_scope_mapping(self, client_id, client):
+        """
+        Get the available client-level roles. Returns the roles for the client that can be associated with the client’s scope.
+
+        :param client_id: id of client (not client-id)
+        :param client: id of client-level roles
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+        
+        :return array RoleRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_AVAILABLE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_effective_client_roles_for_client_scope_mapping(self, client_id, client):
+        """
+        Get effective client roles. Returns the roles for the client that are associated with the client’s scope.
+
+        :param client_id: id of client (not client-id)
+        :param client: id of client-level roles
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+        
+        :return array RoleRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id, "client": client}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_CLIENT_COMPOSITE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def add_realm_roles_to_client_scope_mapping(self, client_id, payload):
+        """
+        Add a set of realm-level roles to the client’s scope.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :param client_id: id of client (not client-id)
+        :param payload: array RoleRepresentation
+
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_post(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM.format(**params_path),
+                                    data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)
+
+    def get_realm_roles_for_client_scope_mapping(self, client_id):
+        """
+        Get realm-level roles associated with the client’s scope.
+
+        :param client_id: id of client (not client-id)
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :return array RoleRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def remove_realm_roles_from_client_scope_mapping(self, client_id, payload):
+        """
+        Remove a set of realm-level roles from the client’s scope.
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+
+        :param client_id: id of client (not client-id)
+        :param payload: array RoleRepresentation
+
+        :return Keycloak server response
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_delete(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM.format(**params_path),
+                                    data=json.dumps(payload))
+        return raise_error_from_response(data_raw, KeycloakGetError, expected_code=204)    
+
+    def get_available_realm_roles_for_client_scope_mapping(self, client_id):
+        """
+        Get realm-level roles that are available to attach to this client’s scope.
+
+        :param client_id: id of client (not client-id)
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+        
+        :return array RoleRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_AVAILABLE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
+
+    def get_effective_realm_roles_for_client_scope_mapping(self, client_id):
+        """
+        Get effective realm-level roles associated with the client’s scope. What this does is recurse any composite roles associated with the client’s scope and adds the roles to this lists.
+
+        :param client_id: id of client (not client-id)
+
+        RoleRepresentation
+        https://www.keycloak.org/docs-api/10.0/rest-api/index.html#_rolerepresentation
+        
+        :return array RoleRepresentation
+        """
+
+        params_path = {"realm-name": self.realm_name, "id": client_id}
+        data_raw = self.raw_get(URL_ADMIN_CLIENT_SCOPE_MAPPINGS_REALM_COMPOSITE.format(**params_path))
+        return raise_error_from_response(data_raw, KeycloakGetError)
 
     def create_realm_role(self, payload, skip_exists=False):
         """
